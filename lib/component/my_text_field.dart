@@ -6,7 +6,7 @@ class MyTextField extends StatelessWidget {
  final bool isPassword;
  final IconData iconData;
  final controller;
- final String? Function(String?)? validate;
+ final validate;
 
 
   MyTextField({required this.label,this.isPassword=false,required this.iconData,required this.controller,required this.validate});

@@ -11,7 +11,7 @@ import '../../enums/toast_state.dart';
 import '../../src/theme.dart';
 
 class UpdateProfileScreen extends StatelessWidget {
-
+  final formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<UpdateProfileCubit,UpdateProfileState>(listener: (context,state){
@@ -28,50 +28,55 @@ class UpdateProfileScreen extends StatelessWidget {
           var cubit = UpdateProfileCubit.get(context);
           return Scaffold(
             backgroundColor: white,
-            body: Column(
-              children: [
-                Container(
-                  height: 300.h,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: KmainColor,
-                    borderRadius: BorderRadius.only(bottomRight: Radius.circular(60),bottomLeft: Radius.circular(60)),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Update Profile',style: TextStyle(fontSize: 34.sp, fontWeight: FontWeight.w600,color: Colors.white),),
+            body: Form(
+              key: formKey,
+              child: Column(
+                children: [
+                  Container(
+                    height: 300.h,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: KmainColor,
+                      borderRadius: BorderRadius.only(bottomRight: Radius.circular(60),bottomLeft: Radius.circular(60)),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Update Profile',style: TextStyle(fontSize: 34.sp, fontWeight: FontWeight.w600,color: Colors.white),),
 
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(height: 80.h,),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                  child: MyTextField(label: 'Your Name',
-                    iconData: Icons.person,
-                    controller: cubit.nameController,
-                    validate: (value){
-                      if(value == null || value.isEmpty)
-                      {
-                        return 'Name Must Not Be Empty';
+                  SizedBox(height: 80.h,),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                    child: MyTextField(label: 'Your Name',
+                      iconData: Icons.person,
+                      controller: cubit.nameController,
+                      validate: (value){
+                        if(value!.isEmpty || !RegExp(r'^[a-z A-Z]+$').hasMatch(value!)){
+                          return "Enter correct name";
+                        }else{
+                          return null;
+                        }
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    height: 100.h,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                    child: MyButton(text: 'Update Profile', function: (){
+                      if(formKey.currentState!.validate()){
+                        cubit.updateProfile();
+                        cubit.nameController.clear();
                       }
-                      return null;
-                    },
-                  ),
-                ),
-                SizedBox(
-                  height: 100.h,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                  child: MyButton(text: 'Update Profile', function: (){
-                    cubit.updateProfile();
-                    cubit.nameController.clear();
-                  }),
-                )
+                    }),
+                  )
 
-              ],
+                ],
+              ),
             ),
           );
         });

@@ -24,7 +24,7 @@ class AddTaskScreen extends StatefulWidget {
 }
 
 class _AddTaskScreenState extends State<AddTaskScreen> {
-
+  final formKey = GlobalKey<FormState>();
 
   DateTime startDate = DateTime.now();
   DateTime endDate = DateTime.now();
@@ -57,164 +57,200 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             body: Padding(
             padding: const EdgeInsets.only(right: 20.0,left: 20,bottom: 20),
             child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+              child: Form(
+                key: formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
 
-                  Text('Add Task',style: TextStyle(fontSize: 24.sp),),
-                  SizedBox(
-                    height: 20.h,
-                  ),
-                  InputField(text: 'Title',
-                      controller: cubit.titleController,
-                      hint: 'Enter your title'),
-                  InputField(text: 'Description',
-                      controller: cubit.descriptionController,
-                      hint: 'Enter your description'),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 150.w,
-                        child: InputField(
-                          text: 'Start Date',
-                          hint: cubit.startDataController.text,
-                          widget: IconButton(
-                              icon: const Icon(
-                                Icons.calendar_today_outlined,
-                                color: Colors.grey,
-                              ),
-                              onPressed: () async {
-                                DateTime? pickerDate = await showDatePicker(
-                                  context: context,
-                                  initialDate: startDate,
-                                  firstDate: DateTime(2015),
-                                  lastDate: DateTime(2121),
-                                );
-
-                                if (pickerDate != null && pickerDate != startDate) {
-                                  setState(() {
-                                    startDate = pickerDate;
-                                    String Onlydate = new DateFormat("yyyy-MM-dd").format(pickerDate);
-                                    cubit.startDataController.text = '$Onlydate';
-                                  });
-                                } else {
-                                  print("it's null or something is wrong");
-                                }
-                              }
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 20.w,
-                      ),
-                      SizedBox(
-                        width: 150.w,
-                        child: InputField(
-                          text: 'End Date',
-                          hint: cubit.endDateContruller.text,
-                          widget: IconButton(
-                              icon: const Icon(
-                                Icons.calendar_today_outlined,
-                                color: Colors.grey,
-                              ),
-                              onPressed: () async {
-                                DateTime? pickerDate = await showDatePicker(
-                                  context: context,
-                                  initialDate: endDate,
-                                  firstDate: DateTime(2015),
-                                  lastDate: DateTime(2121),
-                                );
-
-                                if (pickerDate != null && pickerDate != endDate) {
-                                  setState(() {
-                                    endDate = pickerDate;
-                                    String Onlydate = new DateFormat("yyyy-MM-dd").format(pickerDate);
-                                    cubit.endDateContruller.text = '$Onlydate';
-                                  });
-                                } else {
-                                  print("it's null or something is wrong");
-                                }
-                              }
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    height: 20.h,
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          'Reminder',style: TextStyle(fontSize: 18.sp),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 50.h,
-                        child: ElevatedButton(
-                          style: ButtonStyle(
-                              backgroundColor:
-                              MaterialStateProperty.all(KmainColor),
-                              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                    borderRadius:
-                                BorderRadius.circular(10.0)
-                            ),)),
-                            onPressed: () async {
-                              cubit.ReminderTime = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.now(),
-                              );
-
-                            },
-                            child: Text(
-                              'Show Time Reminder',style: TextStyle(fontSize: 18.sp)
-                            )),
-                      )
-                    ],
-                  ),
-
-
-                  SizedBox(
-                    height: 20.h,
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: Container(
-                      child: cubit.imageFile ==null?
-                      Container():
-                      Container(
-                        width: double.infinity,
-                        height: 250.h,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          image: DecorationImage(
-                              image: FileImage(cubit.imageFile!),fit: BoxFit.fill
-                          ),
-                        ),
-                      )
+                    Text('Add Task',style: TextStyle(fontSize: 24.sp),),
+                    SizedBox(
+                      height: 20.h,
                     ),
-                  ),
-                  SizedBox(
-                    height: 10.h,
-                  ),
+                    InputField(text: 'Title',
+                        controller: cubit.titleController,
+                        hint: 'Enter your title',
+                        validate: (value){
+                          if(value!.isEmpty || !RegExp(r'^[a-z A-Z]+$').hasMatch(value!)){
+                            return "Enter correct title";
+                          }else{
+                            return null;
+                          }
+                        }
+                    ),
+                    InputField(text: 'Description',
+                        controller: cubit.descriptionController,
+                        hint: 'Enter your description',
+                        validate: (value){
+                          if(value!.isEmpty || !RegExp(r'^[a-z A-Z]+$').hasMatch(value!)){
+                            return "Enter correct description";
+                          }else{
+                            return null;
+                          }
+                        }
+
+                    ),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 150.w,
+                          child: InputField(
+                            validate: (value){
+                              if(value!.isEmpty){
+                                return "Enter correct Start Date";
+                              }else{
+                                return null;
+                              }
+                            },
+                            text: 'Start Date',
+                            hint: cubit.startDataController.text,
+                            widget: IconButton(
+                                icon: const Icon(
+                                  Icons.calendar_today_outlined,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: () async {
+                                  DateTime? pickerDate = await showDatePicker(
+                                    context: context,
+                                    initialDate: startDate,
+                                    firstDate: DateTime(2015),
+                                    lastDate: DateTime(2121),
+                                  );
+
+                                  if (pickerDate != null && pickerDate != startDate) {
+                                    setState(() {
+                                      startDate = pickerDate;
+                                      String Onlydate = new DateFormat("yyyy-MM-dd").format(pickerDate);
+                                      cubit.startDataController.text = '$Onlydate';
+                                    });
+                                  } else {
+                                    print("it's null or something is wrong");
+                                  }
+                                }
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 20.w,
+                        ),
+                        SizedBox(
+                          width: 150.w,
+                          child: InputField(
+                            validate: (value){
+                              if(value!.isEmpty){
+                                return "Enter correct end date";
+                              }else{
+                                return null;
+                              }
+                            },
+                            text: 'End Date',
+                            hint: cubit.endDateContruller.text,
+                            widget: IconButton(
+                                icon: const Icon(
+                                  Icons.calendar_today_outlined,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: () async {
+                                  DateTime? pickerDate = await showDatePicker(
+                                    context: context,
+                                    initialDate: endDate,
+                                    firstDate: DateTime(2015),
+                                    lastDate: DateTime(2121),
+                                  );
+
+                                  if (pickerDate != null && pickerDate != endDate) {
+                                    setState(() {
+                                      endDate = pickerDate;
+                                      String Onlydate = new DateFormat("yyyy-MM-dd").format(pickerDate);
+                                      cubit.endDateContruller.text = '$Onlydate';
+                                    });
+                                  } else {
+                                    print("it's null or something is wrong");
+                                  }
+                                }
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(
+                      height: 20.h,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            'Reminder',style: TextStyle(fontSize: 18.sp),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 50.h,
+                          child: ElevatedButton(
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                  MaterialStateProperty.all(KmainColor),
+                                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                    RoundedRectangleBorder(
+                                        borderRadius:
+                                        BorderRadius.circular(10.0)
+                                    ),)),
+                              onPressed: () async {
+                                cubit.ReminderTime = await showTimePicker(
+                                  context: context,
+                                  initialTime: TimeOfDay.now(),
+                                );
+
+                              },
+                              child: Text(
+                                  'Show Time Reminder',style: TextStyle(fontSize: 18.sp)
+                              )),
+                        )
+                      ],
+                    ),
 
 
-                  if(state is AddTaskLoadingState )
+                    SizedBox(
+                      height: 20.h,
+                    ),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Container(
+                          child: cubit.imageFile ==null?
+                          Container():
+                          Container(
+                            width: double.infinity,
+                            height: 250.h,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              image: DecorationImage(
+                                  image: FileImage(cubit.imageFile!),fit: BoxFit.fill
+                              ),
+                            ),
+                          )
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10.h,
+                    ),
 
-                    LinearProgressIndicator(),
-                  MyButton(text: 'Add',
-                      function: (){
-                    cubit.addTask();
-                  }),
-                  SizedBox(
-                    height: 10.h,
-                  )
 
-                ],
+                    if(state is AddTaskLoadingState )
+
+                      LinearProgressIndicator(),
+                    MyButton(text: 'Add',
+                        function: (){
+                          if(formKey.currentState!.validate()){
+                            cubit.addTask();
+                          }
+                        }),
+                    SizedBox(
+                      height: 10.h,
+                    )
+
+                  ],
+                ),
               ),
             ),
           ),

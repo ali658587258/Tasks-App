@@ -8,11 +8,13 @@ class InputField extends StatelessWidget {
   final String hint;
   final Widget? widget;
   final function;
+  final validate;
 
 
 
 
-  InputField({required this.text, this.controller,required this.hint,this.widget,this.function});
+
+  InputField({required this.text, this.controller,required this.hint,this.widget,this.function, this.validate});
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +43,7 @@ class InputField extends StatelessWidget {
                   autofocus: false,
                   controller: controller,
                   onFieldSubmitted: function,
+                  validator: validate,
                   decoration: InputDecoration(
                     hintText: hint,
                     focusedBorder: UnderlineInputBorder(

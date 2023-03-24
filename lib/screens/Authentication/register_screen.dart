@@ -12,7 +12,7 @@ import '../../src/theme.dart';
 import '../Tasks/home_screen.dart';
 
 class RegisterScreen extends StatelessWidget {
-
+  final formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AuthentCubit,AuthentState>(listener: (context,state) {
@@ -29,96 +29,101 @@ class RegisterScreen extends StatelessWidget {
           return Scaffold(
             backgroundColor: white,
             body: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
-                    height: 300.h,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: KmainColor,
-                      borderRadius: BorderRadius.only(bottomRight: Radius.circular(60),bottomLeft: Radius.circular(60)),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Create new',style: TextStyle(fontSize: 34.sp, fontWeight: FontWeight.w600,color: Colors.white),),
-                        Text('account!',style: TextStyle(fontSize: 34.sp,fontWeight: FontWeight.w300,color: Colors.white),),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  children: [
+                    Container(
+                      height: 300.h,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: KmainColor,
+                        borderRadius: BorderRadius.only(bottomRight: Radius.circular(60),bottomLeft: Radius.circular(60)),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Create new',style: TextStyle(fontSize: 34.sp, fontWeight: FontWeight.w600,color: Colors.white),),
+                          Text('account!',style: TextStyle(fontSize: 34.sp,fontWeight: FontWeight.w300,color: Colors.white),),
 
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 50.h,),
+                    SizedBox(height: 50.h,),
 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                    child: MyTextField(
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                      child: MyTextField(
                         label: 'Name',
                         iconData: Icons.person_rounded,
                         controller: cubit.nameController,
-                      validate: (value){
-                        if(value == null || value.isEmpty)
-                        {
-                          return 'Name Must Not Be Empty';
-                        }
-                        return null;
-                      },
+                        validate: (value){
+                          if(value!.isEmpty || !RegExp(r'^[a-z A-Z]+$').hasMatch(value!)){
+                            return "Enter correct name";
+                          }else{
+                            return null;
+                          }
+                        },
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 30.h,),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                    child: MyTextField(
+                    SizedBox(height: 30.h,),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                      child: MyTextField(
                         label: 'Email',
                         iconData: Icons.email,
                         controller: cubit.emailController,
-                      validate: (value){
-                        if(value == null || value.isEmpty)
-                        {
-                          return 'Email Must Not Be Empty';
-                        }
-                        return null;
-                      },
+                        validate: (value){
+                          if(value!.isEmpty || !RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}').hasMatch(value!)){
+                            return "Enter correct email";
+                          }else{
+                            return null;
+                          }
+                        },
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 30.h,),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                    child: MyTextField(
-                      label: 'Password',
-                      iconData: Icons.key,
-                      controller: cubit.passwordController,
-                      isPassword: true,
-                      validate: (value){
-                        if(value == null || value.isEmpty)
-                        {
-                          return 'Password Must Not Be Empty';
-                        }
-                        return null;
-                      },
+                    SizedBox(height: 30.h,),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                      child: MyTextField(
+                        label: 'Password',
+                        iconData: Icons.key,
+                        controller: cubit.passwordController,
+                        isPassword: true,
+                        validate: (value){
+                          if(value!.isEmpty){
+                            return "Enter correct password";
+                          }else{
+                            return null;
+                          }
+                        },
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    height: 30.h,
-                  ),
-                  if(state is RegisterLoding)
-                    LinearProgressIndicator(
-                      color: white,
-                      backgroundColor: KmainColor,
+                    SizedBox(
+                      height: 30.h,
                     ),
-                  SizedBox(
-                    height: 5.h,
-                  ),
+                    if(state is RegisterLoding)
+                      LinearProgressIndicator(
+                        color: white,
+                        backgroundColor: KmainColor,
+                      ),
+                    SizedBox(
+                      height: 5.h,
+                    ),
 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                    child: MyButton(text: 'Sign up!', function: (){
-                      cubit.register();
-                      cubit.emailController.clear();
-                      cubit.nameController.clear();
-                      cubit.passwordController.clear();
-                    }),
-                  ),
-                ],
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                      child: MyButton(text: 'Sign up!', function: (){
+                        if(formKey.currentState!.validate()){
+                          cubit.register();
+                          cubit.emailController.clear();
+                          cubit.nameController.clear();
+                          cubit.passwordController.clear();
+                        }
+                      }),
+                    ),
+                  ],
+                ),
               ),
             ),
           );

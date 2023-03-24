@@ -15,15 +15,8 @@ import '../../enums/toast_state.dart';
 import '../../src/theme.dart';
 import '../bottom_nav_bar.dart';
 
-class LoginScreen extends StatefulWidget {
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
-
-
+class LoginScreen extends StatelessWidget {
+  final formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AuthentCubit,AuthentState>(listener: (context,state) {
@@ -41,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: white,
         body: SingleChildScrollView(
           child: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               children: [
                 Container(
@@ -69,11 +62,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       iconData: Icons.email,
                       controller: cubit.emailController,
                     validate: (value){
-                      if(value == null || value.isEmpty)
-                      {
-                        return 'Email Must Not Be Empty';
+                      if(value!.isEmpty || !RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}').hasMatch(value!)){
+                        return "Enter correct email";
+                      }else{
+                        return null;
                       }
-                      return null;
                     },
                   ),
                 ),
@@ -86,12 +79,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: cubit.passwordController,
                     isPassword: true,
                     validate: (value){
-                      if(value == null || value.isEmpty)
-                      {
-                        return 'Password Must Not Be Empty';
+                      if(value!.isEmpty){
+                        return "Enter correct password";
+                      }else{
+                        return null;
                       }
-                      return null;
-                    },
+                    }
                   ),
                 ),
                 SizedBox(
@@ -110,9 +103,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: MyButton(
                       text: 'Sign in!',
                       function: () {
-                        cubit.login();
-                        cubit.passwordController.clear();
-                        cubit.emailController.clear();
+                        if(formKey.currentState!.validate()){
+                          cubit.login();
+                          cubit.passwordController.clear();
+                          cubit.emailController.clear();
+                        }
+
                       }),
                 ),
               ],
